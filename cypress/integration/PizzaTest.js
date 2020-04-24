@@ -22,7 +22,7 @@ describe("Pizza Order Form", () => {
     cy.get('input[name="Ham"]').check().should("checked");
   });
   it("input special instructions", () => {
-    cy.get('input[name="special"]').type("get me some bacon bits on there").should("have.value", "get me some bacon bits on there");
+    cy.get('input[name="special"]').type("I would like some extra cheese sir").should("have.value", "I would like some extra cheese sir");
   });
   
   it("submit the user", () => {

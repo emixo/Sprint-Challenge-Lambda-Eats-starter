@@ -31,7 +31,7 @@ export default function Form({
               <input type="checkbox" name="Ham" onChange={checkboxChange} />
               <label>Special Instructions</label>
               <input type="text"  name="special" onChange={changeValues} />
-              <button onClick={submitOrder} disabled={disabled}>Place Order</button>
+              <button onClick={submitOrder}>Place Order</button>
           </form>
     
     )
