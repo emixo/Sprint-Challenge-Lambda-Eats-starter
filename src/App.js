@@ -1,27 +1,57 @@
 import React, {useState, useEffect} from "react";
 import {Route, Switch, Link} from 'react-router-dom'
 import * as yup from 'yup'
+import Form from './components/Form'
+
+
+const initialFormValues = {
+  name: "",
+  size: "",
+  Pineapple: "false",
+  Pepperoni: "false",
+  Ham: 'false',
+};
+
+const initialFormErrors = {
+  name: "",  
+};
 
 const App = () => {
 
+  const [orders, setOrders] = useState([]);
+  const [formDisabled, setFormDisabled] = useState(true);
+  const [formErrors, setFormErrors] = useState(initialFormErrors);
+  const [formValues, setFormValues] = useState(initialFormValues);
 
-
-  const initialFormValues = {
-    name: "",
-    size: "",
-    Pineapple: "false",
-    Pepperoni: "false",
-    Ham: 'false',
-  };
-
-  const initialFormErrors = {
-    name: "",  
-  };
+  const changeValues = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    yup
+      .reach(formValidation, name)
+      .validate(value)
+      .then((valid) => {
+        setFormErrors({
+          ...formErrors,
+          [name]: "",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        setFormErrors({
+          ...formErrors,
+          [name]: err.errors[0],
+        });
+      });
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+  }
 
   const formValidation = yup.object().shape({
     name: yup
       .string()
-      .min(3, "username must have at least 3 characters!")
+      .min(2, "username must have at least 3 characters!")
       .required("A username is required!"),
     email: yup
       .string()
@@ -35,6 +65,35 @@ const App = () => {
       .boolean()
       .oneOf([true], "terms are required"),
   });
+
+
+  useEffect(() => {
+    formValidation.isValid(formValues).then((valid) => {
+      setFormDisabled(!valid);
+    });
+  }, [formValues]);
+
+  const checkboxChange = (event) => {
+    setFormValues({
+      ...formValues,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  const submitOrder = (event) => {
+    event.preventDefault();
+
+    const newOrder = {
+      name: formValues.name,
+      size: formValues.email,
+      Pepperoni: formValues.Pepperoni,
+      Sausage: formValues.Sausage,
+      Pineapple: formValues.Pineapple,
+      Ham: formValues.Ham,
+      special: formValues.special
+    };
+    setFormValues(initialFormValues);
+  };
 
 
   return (
@@ -61,30 +120,14 @@ const App = () => {
           </div>
         </Route>
         <Route path="/pizza">
-          <form>
-            <h2>Your Order</h2>
-            <label>Name</label>
-            <input type='text'/>
-            <label>Size</label>
-            <select>
-              <option>Small</option>
-              <option>Medium</option>
-              <option>Large</option>
-            </select>
-
-            <h2>Toppings</h2>
-              <label>Pepperoni</label>
-              <input type="checkbox"/>
-              <label>Sausage</label>
-              <input type="checkbox"/>
-              <label>Pineapple</label>
-              <input type="checkbox"/>
-              <label>Ham</label>
-              <input type="checkbox" />
-              <label>Special Instructions</label>
-              <input type="text" />
-              <button>Place Order</button>
-          </form>
+          <Form 
+          values={formValues}
+          changeValues={changeValues}
+          checkboxChange={checkboxChange}
+          disabled={formDisabled}
+          submitOrder={submitOrder}
+          errors={formErrors}
+          />
         </Route>
       </section>
       <footer></footer>
